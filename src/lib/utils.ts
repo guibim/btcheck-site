@@ -5,20 +5,30 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDateBR(iso: string, tz = "America/Sao_Paulo") {
-  const d = new Date(iso);
-  if (Number.isNaN(+d)) return iso;
-  
-  const formatted = new Intl.DateTimeFormat("pt-BR", {
+/**
+ * Formats dates to dd/mm/yyyy.
+ * Supports:
+ * - "YYYY-MM-DD" (date-only)  -> no Date parsing (avoids timezone shifting like 21:00)
+ * - ISO datetime strings      -> formats to dd/mm/yyyy (no time)
+ */
+export function formatDateBR(value: string, tz = "America/Sao_Paulo") {
+  if (!value) return "";
+
+  // Date-only: YYYY-MM-DD -> dd/mm/yyyy (avoid Date() to prevent timezone quirks)
+  const m = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m) {
+    const [, y, mo, d] = m;
+    return `${d}/${mo}/${y}`;
+  }
+
+  // ISO datetime -> dd/mm/yyyy (timezone-aware)
+  const dt = new Date(value);
+  if (Number.isNaN(dt.getTime())) return "";
+
+  return new Intl.DateTimeFormat("pt-BR", {
     timeZone: tz,
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(d);
-  
-  // Convert from dd/mm/yyyy, HH:mm to dd-mm-yyyy HH:mm
-  return formatted.replace(/\//g, "-").replace(",", "");
+  }).format(dt);
 }
