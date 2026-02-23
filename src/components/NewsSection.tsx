@@ -9,6 +9,7 @@ interface NewsItem {
   summary?: string;
   url: string;
   published_at: string;
+  published_date?: string;  
   source: string;
   image_url?: string;
 }
@@ -77,7 +78,7 @@ const NewsSection = () => {
                 <div className="mb-3 flex items-center gap-3 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
-                    {formatDateBR(item.published_at)}
+                    {formatDateBR(item.published_date ?? item.published_at ?? "")}
                   </span>
                   <span className="flex items-center gap-1">
                     <Building2 className="h-3 w-3" />
@@ -112,3 +113,4 @@ const NewsSection = () => {
 };
 
 export default NewsSection;
+
